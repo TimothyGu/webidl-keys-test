@@ -16,13 +16,14 @@
   console.log("Expected", ["0", "id"]);
   console.log("Actual", Reflect.ownKeys(attributes));
   // >>> CHROME: ["0"]
-  //             (same issue also present in rest of tests, but is omitted)
+  // >>> EDGE:   ["0"]
   
   // Sets own properties, but Symbols are always last.
   attributes[sym] = 42;
   attributes.ownProp = 42;
   console.log("Expected", ["0", "id", "ownProp", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(attributes));
+  // >>> EDGE: ["0", Symbol(), "ownProp"]
 
   // Sets an integer index property, but not an array index. Should be treated
   // as a named property, but since there isn't a named property setter it
@@ -50,15 +51,19 @@
   // ordered chronologically instead of before other own properties as in
   // ordinary objects.
   attributes[2] = 42;
-  // >>> FIREFOX: throws when setting attributes[2].
+  // >>> FIREFOX:   throws when setting attributes[2].
+  // >>> CHROME 61: throws when setting attributes[2].
+
   attributes.ownProp3 = 42;
   console.log("Expected", [
     "0", "1", "id", "class",
     "ownProp", "1099511627776", "ownProp2", "2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
-  // >>> CHROME: ["2", "0", "1",
-  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
+  // >>> CHROME 60: ["2", "0", "1",
+  //                 "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
+  // >>> EDGE:      ["0", "1", "2",
+  //                 Symbol(), "ownProp", "1099511627776", "ownProp2", "ownProp3"]
 
   // Adds another node. Indexed properties should always shadow own properties,
   // since there isn't an "indexed property visibility algorithm".
@@ -72,6 +77,8 @@
     "ownProp", "1099511627776", "ownProp2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
-  // >>> CHROME: ["2", "0", "1",
-  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
+  // >>> CHROME 60: ["2", "0", "1",
+  //                 "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
+  // >>> EDGE:      ["0", "1", "2", "2",
+  //                 Symbol(), "ownProp", "1099511627776", "ownProp2", "ownProp3"]
 })();

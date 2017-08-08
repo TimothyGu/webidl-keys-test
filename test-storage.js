@@ -19,10 +19,12 @@
   sessionStorage.getItem = 42;
   console.log("Expected", "number");
   console.log("Actual", typeof sessionStorage.getItem);
-  // >>> FIREFOX: Prints function getItem()
+  // >>> FIREFOX: Prints function
+  // >>> EDGE:    Prints function
   console.log("Expected", ["getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
   // >>> FIREFOX: Prints []
+  // >>> EDGE:    Prints ["getItem"]
 
   // Supported property names should be enumerated first. When setting, 42 is
   // coerced to a string through IDL type conversion.
@@ -31,8 +33,9 @@
   console.log("Actual", typeof sessionStorage.myProp);
   console.log("Expected", ["myProp", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", Symbol(), "myProp"]
+  // >>> CHROME:  Prints ["getItem", Symbol(), "myProp"]
   // >>> FIREFOX: Prints ["myProp"]
+  // >>> EDGE:    Prints ["getItem", "myProp"]
 
   // Sets an integer index property but not an array index. Treated as a named
   // property. When getting all own property keys it should be ordered
@@ -41,8 +44,9 @@
   sessionStorage[1099511627776/*=2**40*/] = 42;
   console.log("Expected", ["myProp", "1099511627776", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", Symbol(), "1099511627776", "myProp"].
+  // >>> CHROME:  Prints ["getItem", Symbol(), "1099511627776", "myProp"]
   // >>> FIREFOX: Prints ["1099511627776", "myProp"]
+  // >>> EDGE:    Prints ["getItem", "myProp", "1099511627776"]
 
   // Sets an array index property. Not treated as a named property under the
   // current [[Set]] spec (TODO), but as an own property. When getting all own
@@ -52,11 +56,13 @@
   console.log("Expected", "number");
   console.log("Expected w/ revised [[Set]]", "string");
   console.log("Actual", typeof sessionStorage[1]);
-  // >>> CHROME: Prints "42".
-  // >>> FIREFOX: Prints "42".
+  // >>> CHROME:  Prints "string"
+  // >>> FIREFOX: Prints "string"
+  // >>> EDGE:    Prints "string"
   console.log("Expected", ["myProp", "1099511627776", "getItem", "1", sym.toString()]);
   console.log("Expected w/ revised [[Set]]", ["myProp", "1099511627776", "1", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", Symbol(), "1", "1099511627776", "myProp"]
+  // >>> CHROME:  Prints ["getItem", Symbol(), "1", "1099511627776", "myProp"]
   // >>> FIREFOX: Prints ["1099511627776", "1", "myProp"]
+  // >>> EDGE:    Prints ["getItem", "myProp", "1099511627776", "1"]
 })();
