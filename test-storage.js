@@ -11,42 +11,44 @@
   const { sessionStorage } = window;
   sessionStorage.clear();
   
-  // Sets own properties. "getItem" is an own property because it is a property
-  // on Storage.prototype, and thus not visible according to the named property
-  // visibility algorithm, so setting it will fall back to setting own
-  // property. Symbols are always last.
+  // Sets an own property symbol.
   sessionStorage[sym] = 42;
-  sessionStorage.getItem = 42;
-  console.log("Expected", "number");
-  console.log("Actual", typeof sessionStorage.getItem);
-  // >>> FIREFOX: Prints function
-  // >>> EDGE:    Prints function
-  console.log("Expected", ["getItem", sym.toString()]);
+  console.log("Expected", [sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
   // >>> FIREFOX: Prints []
-  // >>> EDGE:    Prints ["getItem"]
+  // >>> EDGE:    Prints []
+
+  // "getItem" is a property on Storage.prototype, and thus not visible
+  // according to the named property visibility algorithm. So while setting it
+  // will invoke the setter, getting it will fall back to the prototype
+  // property.
+  sessionStorage.getItem = 42;
+  console.log("Expected", "function");
+  console.log("Actual", typeof sessionStorage.getItem);
+  // >>> CHROME: Prints number
+  console.log("Expected", [sym.toString()]);
+  console.log("Actual", Reflect.ownKeys(sessionStorage));
+  // >>> CHROME: Prints ["getItem", Symbol()]
+  // >>> EDGE:   Prints ["getItem"]
 
   // Supported property names should be enumerated first. When setting, 42 is
   // coerced to a string through IDL type conversion.
   sessionStorage.myProp = 42;
   console.log("Expected", "string");
   console.log("Actual", typeof sessionStorage.myProp);
-  console.log("Expected", ["myProp", "getItem", sym.toString()]);
+  console.log("Expected", ["myProp", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME:  Prints ["getItem", Symbol(), "myProp"]
-  // >>> FIREFOX: Prints ["myProp"]
-  // >>> EDGE:    Prints ["getItem", "myProp"]
+  // >>> CHROME: Prints ["getItem", Symbol(), "myProp"]
 
   // Sets an integer index property but not an array index. Treated as a named
   // property. When getting all own property keys it should be ordered
-  // chronologically instead of before other own properties as in ordinary
-  // objects.
+  // chronologically per Storage semantics instead of before other own
+  // properties as in ordinary objects.
   sessionStorage[1099511627776/*=2**40*/] = 42;
-  console.log("Expected", ["myProp", "1099511627776", "getItem", sym.toString()]);
+  console.log("Expected", ["myProp", "1099511627776", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
   // >>> CHROME:  Prints ["getItem", Symbol(), "1099511627776", "myProp"]
   // >>> FIREFOX: Prints ["1099511627776", "myProp"]
-  // >>> EDGE:    Prints ["getItem", "myProp", "1099511627776"]
 
   // Sets an array index property. Not treated as a named property under the
   // current [[Set]] spec (TODO), but as an own property. When getting all own
@@ -59,10 +61,8 @@
   // >>> CHROME:  Prints "string"
   // >>> FIREFOX: Prints "string"
   // >>> EDGE:    Prints "string"
-  console.log("Expected", ["myProp", "1099511627776", "getItem", "1", sym.toString()]);
-  console.log("Expected w/ revised [[Set]]", ["myProp", "1099511627776", "1", "getItem", sym.toString()]);
+  console.log("Expected", ["myProp", "1099511627776", "1", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
   // >>> CHROME:  Prints ["getItem", Symbol(), "1", "1099511627776", "myProp"]
   // >>> FIREFOX: Prints ["1099511627776", "1", "myProp"]
-  // >>> EDGE:    Prints ["getItem", "myProp", "1099511627776", "1"]
 })();
