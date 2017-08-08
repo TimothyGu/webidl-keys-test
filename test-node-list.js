@@ -17,7 +17,7 @@
   // Sets own properties, but Symbols are always last.
   nodes[sym] = 42;
   nodes.ownProp = 42;
-  console.log("Expected", ["0", "ownProp", sym]);
+  console.log("Expected", ["0", "ownProp", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(nodes));
 
   // Sets an integer index property, but not an array index. Should be treated
@@ -29,7 +29,7 @@
   nodes.ownProp2 = 42;
   console.log("Expected", [
     "0",
-    "ownProp", "1099511627776", "ownProp2", sym
+    "ownProp", "1099511627776", "ownProp2", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(nodes));
 
@@ -37,7 +37,7 @@
   el.appendChild(document.createTextNode("42"));
   console.log("Expected", [
     "0", "1",
-    "ownProp", "1099511627776", "ownProp2", sym
+    "ownProp", "1099511627776", "ownProp2", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(nodes));
   
@@ -50,10 +50,10 @@
   nodes.ownProp3 = 42;
   console.log("Expected", [
     "0", "1",
-    "ownProp", "1099511627776", "ownProp2", "2", "ownProp3", sym
+    "ownProp", "1099511627776", "ownProp2", "2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(nodes));
-  // >>> CHROME: ["2", "0", "1", "ownProp", "1099511627776", "ownProp2", "ownProp3", sym]
+  // >>> CHROME: ["2", "0", "1", "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
 
   // Adds another node. Indexed properties should always shadow own properties,
   // since there isn't an "indexed property visibility algorithm".
@@ -63,8 +63,8 @@
   console.log("Actual", nodes[2]);
   console.log("Expected", [
     "0", "1", "2",
-    "ownProp", "1099511627776", "ownProp2", "ownProp3", sym
+    "ownProp", "1099511627776", "ownProp2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(nodes));
-  // >>> CHROME: ["2", "0", "1", "ownProp", "1099511627776", "ownProp2", "ownProp3", sym]
+  // >>> CHROME: ["2", "0", "1", "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
 })();

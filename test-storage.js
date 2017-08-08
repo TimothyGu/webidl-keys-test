@@ -17,21 +17,21 @@
   // property. Symbols are always last.
   sessionStorage[sym] = 42;
   sessionStorage.getItem = 42;
-  console.log("Expected", 42);
-  console.log("Actual", sessionStorage.getItem);
+  console.log("Expected", "number");
+  console.log("Actual", typeof sessionStorage.getItem);
   // >>> FIREFOX: Prints function getItem()
-  console.log("Expected", ["getItem", sym]);
+  console.log("Expected", ["getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
   // >>> FIREFOX: Prints []
 
   // Supported property names should be enumerated first. When setting, 42 is
   // coerced to a string through IDL type conversion.
   sessionStorage.myProp = 42;
-  console.log("Expected", "42");
-  console.log("Actual", sessionStorage.myProp);
-  console.log("Expected", ["myProp", "getItem", sym]);
+  console.log("Expected", "string");
+  console.log("Actual", typeof sessionStorage.myProp);
+  console.log("Expected", ["myProp", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", sym, "myProp"]
+  // >>> CHROME: Prints ["getItem", Symbol(), "myProp"]
   // >>> FIREFOX: Prints ["myProp"]
 
   // Sets an integer index property but not an array index. Treated as a named
@@ -39,9 +39,9 @@
   // chronologically instead of before other own properties as in ordinary
   // objects.
   sessionStorage[1099511627776/*=2**40*/] = 42;
-  console.log("Expected", ["myProp", "1099511627776", "getItem", sym]);
+  console.log("Expected", ["myProp", "1099511627776", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", sym, "1099511627776", "myProp"].
+  // >>> CHROME: Prints ["getItem", Symbol(), "1099511627776", "myProp"].
   // >>> FIREFOX: Prints ["1099511627776", "myProp"]
 
   // Sets an array index property. Not treated as a named property under the
@@ -49,14 +49,14 @@
   // property keys it should be ordered chronologically instead of before other
   // own properties as in ordinary objects.
   sessionStorage[1] = 42;
-  console.log("Expected", 42);
-  console.log("Expected w/ revised [[Set]]", "42");
-  console.log("Actual", sessionStorage[1]);
+  console.log("Expected", "number");
+  console.log("Expected w/ revised [[Set]]", "string");
+  console.log("Actual", typeof sessionStorage[1]);
   // >>> CHROME: Prints "42".
   // >>> FIREFOX: Prints "42".
-  console.log("Expected", ["myProp", "1099511627776", "getItem", "1", sym]);
-  console.log("Expected w/ revised [[Set]]", ["myProp", "1099511627776", "1", "getItem", sym]);
+  console.log("Expected", ["myProp", "1099511627776", "getItem", "1", sym.toString()]);
+  console.log("Expected w/ revised [[Set]]", ["myProp", "1099511627776", "1", "getItem", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(sessionStorage));
-  // >>> CHROME: Prints ["getItem", sym, "1", "1099511627776", "myProp"]
+  // >>> CHROME: Prints ["getItem", Symbol(), "1", "1099511627776", "myProp"]
   // >>> FIREFOX: Prints ["1099511627776", "1", "myProp"]
 })();

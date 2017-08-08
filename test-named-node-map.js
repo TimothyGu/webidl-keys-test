@@ -21,7 +21,7 @@
   // Sets own properties, but Symbols are always last.
   attributes[sym] = 42;
   attributes.ownProp = 42;
-  console.log("Expected", ["0", "id", "ownProp", sym]);
+  console.log("Expected", ["0", "id", "ownProp", sym.toString()]);
   console.log("Actual", Reflect.ownKeys(attributes));
 
   // Sets an integer index property, but not an array index. Should be treated
@@ -33,7 +33,7 @@
   attributes.ownProp2 = 42;
   console.log("Expected", [
     "0", "id",
-    "ownProp", "1099511627776", "ownProp2", sym
+    "ownProp", "1099511627776", "ownProp2", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
 
@@ -41,7 +41,7 @@
   el.setAttribute("class", "my-class");
   console.log("Expected", [
     "0", "1", "id", "class",
-    "ownProp", "1099511627776", "ownProp2", sym
+    "ownProp", "1099511627776", "ownProp2", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
   
@@ -54,11 +54,11 @@
   attributes.ownProp3 = 42;
   console.log("Expected", [
     "0", "1", "id", "class",
-    "ownProp", "1099511627776", "ownProp2", "2", "ownProp3", sym
+    "ownProp", "1099511627776", "ownProp2", "2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
   // >>> CHROME: ["2", "0", "1",
-  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", sym]
+  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
 
   // Adds another node. Indexed properties should always shadow own properties,
   // since there isn't an "indexed property visibility algorithm".
@@ -69,9 +69,9 @@
   console.log("Actual", attributes[2]);
   console.log("Expected", [
     "0", "1", "2", "id", "class", "data-third",
-    "ownProp", "1099511627776", "ownProp2", "ownProp3", sym
+    "ownProp", "1099511627776", "ownProp2", "ownProp3", sym.toString()
   ]);
   console.log("Actual", Reflect.ownKeys(attributes));
   // >>> CHROME: ["2", "0", "1",
-  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", sym]
+  //              "ownProp", "1099511627776", "ownProp2", "ownProp3", Symbol()]
 })();
